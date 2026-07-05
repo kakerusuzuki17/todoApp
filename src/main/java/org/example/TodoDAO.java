@@ -43,7 +43,7 @@ public class TodoDAO {
 
         List<Todo> todos = new ArrayList<>();
         String startDate = yearMonth.atDay(1).toString();
-        String endDate = yearMonth.atEndOfMonth().toString();
+        String endDate = yearMonth.plusMonths(1).atDay(1).toString();
 
         String sql = """
             SELECT id, title, start, end, priority, memo, icon FROM todo
@@ -53,7 +53,7 @@ public class TodoDAO {
 
         try (
                 Connection conn = DriverManager.getConnection(URL);
-                PreparedStatement ps = conn.prepareStatement(sql);
+                PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
             ps.setString(1, startDate);
@@ -160,7 +160,7 @@ public class TodoDAO {
                 """;
 
         try (
-                Connection conn = DriverManager.getConnection(URL);
+                Connection conn = DriverManager.getConnection(URL)
         ) {
             PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -186,7 +186,7 @@ public class TodoDAO {
                 """;
 
         try (
-                Connection conn = DriverManager.getConnection(URL);
+                Connection conn = DriverManager.getConnection(URL)
         ) {
             PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -208,7 +208,7 @@ public class TodoDAO {
                 """;
 
         try (
-                Connection conn = DriverManager.getConnection(URL);
+                Connection conn = DriverManager.getConnection(URL)
         ) {
             PreparedStatement ps = conn.prepareStatement(sql);
 

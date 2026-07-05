@@ -49,7 +49,7 @@ public class TodoCell extends ListCell<Todo> {
             priorityLevel = "★★★★★";
         }
 
-        Label time = new Label(
+        Label todoLabel = new Label(
                 todo.getStart().getMonthValue() + "月 "
                     + todo.getStart().getDayOfMonth() + "日 ("
                     + weekDay[todo.getStart().getDayOfWeek().getValue()] + ") "
@@ -59,11 +59,11 @@ public class TodoCell extends ListCell<Todo> {
                     + todo.getTitle() + "\n"
                     + todo.getMemo()
         );
-        time.setStyle("""
+        todoLabel.setStyle("""
                     -fx-font-size: 16;
                 """);
 
-        VBox text = new VBox(time);
+        VBox text = new VBox(todoLabel);
         HBox root = new HBox(10, icon, text);
 
         setGraphic(root);

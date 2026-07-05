@@ -383,6 +383,7 @@ public class MainController {
         TodoDAO.insert(title, start, end, priority, memo, selectedIcon);
         titleField.clear();
         todos.clear();
+        memoTextArea.clear();
         todos.addAll(TodoDAO.selectMonth(yearMonth));
         makeCalendar();
     }
