@@ -51,6 +51,12 @@ public class MainController {
     private Label yearMonthLabel;
     @FXML
     private Pane achievePane;
+    @FXML
+    private Button editButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button achieveButton;
     private String selectedIcon;
     private StackPane selectedCell;
     private StackPane todayCell;
@@ -91,12 +97,20 @@ public class MainController {
         iconImageView.setImage(new Image("/icons/hospital1.png"));
         selectedIcon = "hospital1.png";
 
+        todoListView.getSelectionModel().selectedItemProperty().addListener( // 予定選択時のみボタンを有効に
+                (obs, oldTodo, newTodo) -> {
+                    editButton.setDisable(newTodo == null);
+                    deleteButton.setDisable(newTodo == null);
+                    achieveButton.setDisable(newTodo == null);
+                }
+        );
+
         makeCalendar(); // カレンダー日付作成
         makeTodoList(); // 予定リスト作成
         setAchievePane(); // 達成済みアイコンをランダム表示
     }
 
-    private void makeCalendar() {
+    private void makeCalendar() { // カレンダー日付作成
         calendarGridPane.getChildren().clear();
         yearMonthLabel.setText(yearMonth.toString());
         int lastDay = yearMonth.lengthOfMonth(); // 月末
@@ -197,7 +211,7 @@ public class MainController {
             }
             cell.getChildren().add(dayLabel);
 
-            cell.setOnMouseClicked(e -> {
+            cell.setOnMouseClicked(e -> { // 日付がクリックされたら
                 // 前回選択セルの色を元に戻す
                 if (selectedCell != null) {
                     if (selectedCell == todayCell) { // 今日の日付
@@ -227,15 +241,33 @@ public class MainController {
         }
     }
 
-    private void makeTodoList() {
+    private void makeTodoList() { // 予定リスト作成
         todoListView.getItems().clear();
         todoListView.setItems(todos);
+
+        todoListView.setOnMouseClicked(e -> { // 予定がクリックされたら各値を入力フィールドに表示
+            Todo todoSelected = todoListView.getSelectionModel().getSelectedItem();
+            if (todoSelected != null) {
+//                editButton.setDisable(true); // 編集ボタンを有効に
+                titleField.setText(todoSelected.getTitle());
+                startDatePicker.setValue(todoSelected.start.toLocalDate());
+                startHourComboBox.setValue(todoSelected.start.getHour());
+                startMinuteComboBox.setValue(todoSelected.start.getMinute());
+                endHourComboBox.setValue(todoSelected.end.getHour());
+                endMinuteComboBox.setValue(todoSelected.end.getMinute());
+                prioritySlider.setValue(todoSelected.getPriority());
+                priorityLevelSet((int) prioritySlider.getValue());
+                iconImageView.setImage(new Image(getClass().getResourceAsStream("/icons/" + todoSelected.getIcon())));
+                memoTextArea.setText(todoSelected.getMemo());
+            }
+        });
+
         todoListView.setCellFactory(list -> new TodoCell());
         todos.clear();
         todos.addAll(TodoDAO.selectMonth(yearMonth));
     }
 
-    private void setAchievePane() {
+    private void setAchievePane() { // 達成アイコン表示
         achievePane.getChildren().clear();
         List<Todo> AchieveIcons = TodoDAO.selectAchieve();
         for (Todo icon : AchieveIcons) {
@@ -261,7 +293,7 @@ public class MainController {
     }
 
     @FXML
-    private void onPriorityChanged() {
+    private void onPriorityChanged() { // 優先度スライダーを触っている時
 
         priorityLevelSet((int) prioritySlider.getValue());
     }
@@ -292,7 +324,7 @@ public class MainController {
         TilePane tilePane = new TilePane();
         tilePane.setHgap(10);
         tilePane.setVgap(10);
-        tilePane.setPrefColumns(7); // 1行に7個並べる（任意）
+        tilePane.setPrefColumns(7); // 1行に7個並べる
 
         ScrollPane scrollPane = new ScrollPane(tilePane);
         scrollPane.setFitToWidth(true);
@@ -355,37 +387,20 @@ public class MainController {
         Integer startMinute = startMinuteComboBox.getValue();
         Integer endHour = endHourComboBox.getValue();
         Integer endMinute = endMinuteComboBox.getValue();
-        LocalTime startTime = LocalTime.of(startHour, startMinute);
-        LocalDateTime start = LocalDateTime.of(startDate, startTime);
-        LocalTime endTime = LocalTime.of(endHour, endMinute);
-        LocalDateTime end = LocalDateTime.of(endDate, endTime);
+        LocalDateTime start = LocalDateTime.of(startDate, LocalTime.of(startHour, startMinute));
+        LocalDateTime end = LocalDateTime.of(endDate, LocalTime.of(endHour, endMinute));
         String memo = memoTextArea.getText();
         Integer priority = (int) prioritySlider.getValue();
 
-        if (title.isBlank()) { // タイトルが入力されていない場合
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("入力エラー");
-            alert.setHeaderText("タイトルが入力されていません");
-            alert.setContentText("タイトルを入力してください。");
-            alert.showAndWait();
-            return;
-        }
+        if (checkData(title, start, end, memo)) {
 
-        if (!start.isBefore(end)) { // 開始・終了時刻
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("入力エラー");
-            alert.setHeaderText("時刻が正しくありません");
-            alert.setContentText("開始時刻は終了時刻より前にしてください。");
-            alert.showAndWait();
-            return;
+            TodoDAO.insert(title, start, end, priority, memo, selectedIcon);
+            titleField.clear();
+            todos.clear();
+            memoTextArea.clear();
+            todos.addAll(TodoDAO.selectMonth(yearMonth));
+            makeCalendar();
         }
-
-        TodoDAO.insert(title, start, end, priority, memo, selectedIcon);
-        titleField.clear();
-        todos.clear();
-        memoTextArea.clear();
-        todos.addAll(TodoDAO.selectMonth(yearMonth));
-        makeCalendar();
     }
 
     @FXML
@@ -396,6 +411,35 @@ public class MainController {
         if (todo != null) {
             TodoDAO.delete(todo.getId());
             todos.clear();
+            todos.addAll(TodoDAO.selectMonth(yearMonth));
+            makeCalendar();
+        }
+    }
+
+    @FXML
+    private void onEditButtonClick() { //編集ボタン押下
+
+        String title = titleField.getText();
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = startDatePicker.getValue();
+        Integer startHour = startHourComboBox.getValue();
+        Integer startMinute = startMinuteComboBox.getValue();
+        Integer endHour = endHourComboBox.getValue();
+        Integer endMinute = endMinuteComboBox.getValue();
+        LocalTime startTime = LocalTime.of(startHour, startMinute);
+        LocalDateTime start = LocalDateTime.of(startDate, startTime);
+        LocalTime endTime = LocalTime.of(endHour, endMinute);
+        LocalDateTime end = LocalDateTime.of(endDate, endTime);
+        String memo = memoTextArea.getText();
+        Integer priority = (int) prioritySlider.getValue();
+        int id = todoListView.getSelectionModel().getSelectedItem().getId();
+
+        if (checkData(title, start, end, memo)) {
+
+            TodoDAO.update(title, start, end, priority, memo, selectedIcon, id);
+            titleField.clear();
+            todos.clear();
+            memoTextArea.clear();
             todos.addAll(TodoDAO.selectMonth(yearMonth));
             makeCalendar();
         }
@@ -413,5 +457,45 @@ public class MainController {
             makeCalendar();
             setAchievePane();
         }
+    }
+
+    private boolean checkData(String title, LocalDateTime start, LocalDateTime end, String memo) {
+        if (title.isBlank()) { // タイトルが入力されていない場合
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("入力エラー");
+            alert.setHeaderText("タイトルが入力されていません");
+            alert.setContentText("タイトルを入力してください。");
+            alert.showAndWait();
+            return false;
+        }
+
+        if (title.length() > 50) { // タイトルが50文字より長い場合
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("入力エラー");
+            alert.setHeaderText("タイトルが長すぎます");
+            alert.setContentText("タイトルは50字以内で入力してください。");
+            alert.showAndWait();
+            return false;
+        }
+
+        if (!start.isBefore(end)) { // 開始・終了時刻
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("入力エラー");
+            alert.setHeaderText("時刻が正しくありません");
+            alert.setContentText("開始時刻は終了時刻より前にしてください。");
+            alert.showAndWait();
+            return false;
+        }
+
+        if (memo.length() > 500) { // メモが500文字より長い場合
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("入力エラー");
+            alert.setHeaderText("メモが長すぎます");
+            alert.setContentText("メモは500字以内で入力してください。");
+            alert.showAndWait();
+            return false;
+        }
+
+        return true;
     }
 }

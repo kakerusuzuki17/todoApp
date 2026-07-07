@@ -102,21 +102,27 @@
             <Font size="18.0" />
           </font>
         </Label>
-            <Button fx:id="addButton" layoutX="980.0" layoutY="619.0" mnemonicParsing="false" onAction="#onAddButtonClick" prefHeight="47.0" prefWidth="67.0" text="追加" />
-            <TextField fx:id="titleField" layoutX="833.0" layoutY="85.0" prefHeight="25.0" prefWidth="419.0" />
-            <Label alignment="CENTER" layoutX="758.0" layoutY="84.0" style="&#10;" text="タイトル:" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+            <Button fx:id="addButton" layoutX="960.0" layoutY="619.0" mnemonicParsing="false" onAction="#onAddButtonClick" prefHeight="47.0" prefWidth="67.0" text="追加" />
+            <TextField fx:id="titleField" layoutX="833.0" layoutY="85.0" prefHeight="25.0" prefWidth="419.0">
+               <font>
+                  <Font size="16.0" />
+               </font></TextField>
+            <Label alignment="CENTER" layoutX="764.0" layoutY="89.0" style="&#10;" text="タイトル:" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
             <ListView fx:id="todoListView" layoutX="31.0" layoutY="406.0" prefHeight="178.0" prefWidth="683.0" />
-            <Button fx:id="deleteButton" layoutX="523.0" layoutY="605.0" mnemonicParsing="false" onAction="#onDeleteButtonClick" prefHeight="47.0" prefWidth="67.0" text="削除" />
+            <Button fx:id="deleteButton" disable="true" layoutX="523.0" layoutY="605.0" mnemonicParsing="false" onAction="#onDeleteButtonClick" prefHeight="47.0" prefWidth="67.0" text="削除" />
             <DatePicker fx:id="startDatePicker" layoutX="786.0" layoutY="136.0" prefHeight="25.0" prefWidth="135.0" />
             <ComboBox fx:id="startHourComboBox" layoutX="993.0" layoutY="135.0" prefHeight="28.0" prefWidth="98.0" promptText="12" />
             <ComboBox fx:id="endHourComboBox" layoutX="994.0" layoutY="177.0" prefHeight="28.0" prefWidth="97.0" promptText="13" />
             <ComboBox fx:id="startMinuteComboBox" layoutX="1114.0" layoutY="135.0" prefHeight="28.0" prefWidth="97.0" promptText="00" />
             <ComboBox fx:id="endMinuteComboBox" layoutX="1114.0" layoutY="177.0" prefHeight="28.0" prefWidth="97.0" promptText="00" />
-            <TextArea fx:id="memoTextArea" layoutX="773.0" layoutY="352.0" prefHeight="253.0" prefWidth="517.0" />
+            <TextArea fx:id="memoTextArea" layoutX="773.0" layoutY="352.0" prefHeight="253.0" prefWidth="517.0">
+               <font>
+                  <Font size="16.0" />
+               </font></TextArea>
             <Slider fx:id="prioritySlider" layoutX="986.0" layoutY="251.0" onMouseDragged="#onPriorityChanged" prefHeight="24.0" prefWidth="272.0" />
             <Label alignment="CENTER" layoutX="912.0" layoutY="249.0" style="&#10;" text="優先度:" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
                <font>
@@ -205,8 +211,8 @@
                   <Font size="18.0" />
                </font>
             </Label>
-            <Button fx:id="achieveButton" layoutX="619.0" layoutY="605.0" mnemonicParsing="false" onAction="#onAchieveButtonClick" prefHeight="47.0" prefWidth="67.0" text="達成!" />
-            <Label alignment="CENTER" layoutX="773.0" layoutY="330.0" style="&#10;" text="memo:" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+            <Button fx:id="achieveButton" disable="true" layoutX="619.0" layoutY="605.0" mnemonicParsing="false" onAction="#onAchieveButtonClick" prefHeight="47.0" prefWidth="67.0" text="達成!" />
+            <Label alignment="CENTER" layoutX="773.0" layoutY="324.0" style="&#10;" text="memo:" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
                <font>
                   <Font size="18.0" />
                </font>
@@ -222,6 +228,7 @@
                </font>
             </Label>
             <Pane fx:id="achievePane" layoutX="31.0" layoutY="594.0" prefHeight="81.0" prefWidth="200.0" />
+            <Button fx:id="editButton" disable="true" layoutX="1058.0" layoutY="619.0" mnemonicParsing="false" onAction="#onEditButtonClick" prefHeight="47.0" prefWidth="67.0" text="編集" />
       </children>
     </AnchorPane>
   </children>

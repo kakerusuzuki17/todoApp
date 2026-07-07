@@ -16,11 +16,11 @@ public class TodoDAO {
         String sql = """
                 CREATE TABLE IF NOT EXISTS todo (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT NOT NULL,
+                    title TEXT NOT NULL CHECK(length(title) <= 50),
                     start DATETIME NOT NULL,
                     end DATETIME NOT NULL,
                     priority INTEGER NOT NULL,
-                    memo TEXT,
+                    memo TEXT CHECK(length(memo) <= 500),
                     icon TEXT NOT NULL,
                     achieve BOOLEAN NOT NULL DEFAULT 0
                 );
@@ -122,9 +122,7 @@ public class TodoDAO {
 
     public static List<Todo> selectAchieve() {
 
-//        List<String> achieveIcons = new ArrayList<>();
         List<Todo> list = new ArrayList<>();
-
         String sql = "SELECT id, priority, icon FROM todo WHERE achieve = 1 ORDER BY id";
 
         try (
@@ -173,6 +171,35 @@ public class TodoDAO {
 
             int successCnt = ps.executeUpdate();
             System.out.println("insertDatabase " + successCnt);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void update(String title, LocalDateTime start, LocalDateTime end, Integer priority, String memo, String icon, int id) {
+
+        String sql = """
+                UPDATE todo
+                SET title = ?, start = ?, end = ?, priority = ?, memo = ?, icon = ?
+                WHERE id = ?;
+                """;
+
+        try (
+                Connection conn = DriverManager.getConnection(URL)
+        ) {
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setObject(1, title);
+            ps.setObject(2, start);
+            ps.setObject(3, end);
+            ps.setObject(4, priority);
+            ps.setObject(5, memo);
+            ps.setObject(6, icon);
+            ps.setObject(7, id);
+
+            int successCnt = ps.executeUpdate();
+            System.out.println("updateDatabase " + successCnt);
 
         } catch (SQLException e) {
             e.printStackTrace();
