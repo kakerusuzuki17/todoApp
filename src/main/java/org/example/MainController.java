@@ -258,6 +258,7 @@ public class MainController {
                 prioritySlider.setValue(todoSelected.getPriority());
                 priorityLevelSet((int) prioritySlider.getValue());
                 iconImageView.setImage(new Image(getClass().getResourceAsStream("/icons/" + todoSelected.getIcon())));
+                selectedIcon = todoSelected.getIcon();
                 memoTextArea.setText(todoSelected.getMemo());
             }
         });
